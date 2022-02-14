@@ -199,6 +199,7 @@ for (let x = 0; x < width; ++x) {
 render(canvas, ctx, frameBuffer);
 ```
 ![结果](./textures/start_1.png)
+
 可以看出(0,0)点在左上角，x往右为正轴,y往下为正轴，是**右手系**，所以我们的坐标系如下图：
 ![坐标系](./textures/start_2.png)
 
