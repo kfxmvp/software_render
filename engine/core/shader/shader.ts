@@ -100,7 +100,7 @@ export class Shader {
         return v2f;
     }
 
-    /**片源着色 */
+    /**片元着色 */
     public fragmentShader(vert2frag: Vert2Frag): Color {
         const color = new Color();
         if (!!this._texture) color.setWithColor(this._texture.getColorWithUV(vert2frag.u, vert2frag.v))

@@ -1,5 +1,5 @@
-import { Vec4 } from "../base/vec4";
-import { Vertex } from "../base/vertex";
+import { Vec4 } from "./vec4";
+import { Vertex } from "./vertex";
 
 export class Mesh {
     public VBO: Array<Vertex>;
