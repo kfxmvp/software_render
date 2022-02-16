@@ -32,7 +32,7 @@ camera.lookAt(0, 0, -1);
 // 使用正交摄像机
 camera.useOrthographicCamera();
 // 使用透视摄像机
-camera.usePerspectiveCamera();
+// camera.usePerspectiveCamera();
 
 const viewMat = camera.getViewMatrix();
 const projectionMat = camera.isOrthographicCamera()
@@ -42,10 +42,44 @@ const projectionMat = camera.isOrthographicCamera()
 // 网格
 const mesh = new Mesh();
 if (camera.isOrthographicCamera()) {
-    mesh.createBox(new Vec4(0, 0, -1), 100);
+    mesh.createBox(new Vec4(0, 0, 1), 100);
 }
 else {
     mesh.createBox(new Vec4(0, 0, -1), 1);
+}
+
+// 深度信息
+let zBuffer: Float32Array;
+
+// 每帧需要清除深度信息 重新获取
+function clearZBuffer() {
+    zBuffer = new Float32Array(width * height).fill(Infinity);
+}
+
+// 根据当前像素位置信息(x,y)获取深度信息数组中的下标index
+function getZBufferIndexWithPosition(x: number, y: number): number {
+    return x + y * width;
+}
+
+// 根据当前像素位置信息(x,y) 设置对应深度的值为zIndex
+function setZBufferWithPosition(x: number, y: number, zIndex: number) {
+    zBuffer[getZBufferIndexWithPosition(x, y)] = zIndex;
+}
+
+// 根据当前像素位置信息(x,y) 获取对应深度的值zIndex
+function getZBufferWithPosition(x: number, y: number): number {
+    return zBuffer[getZBufferIndexWithPosition(x, y)];
+}
+
+// 深度检测 根据当前像素位置信息(x,y) 检测是否需要更新对应的深度信息，并且该颜色需要渲染到该像素上
+function zBufferTest(x: number, y: number, zIndex: number): boolean {
+    const oldZIndex = getZBufferWithPosition(x, y);
+    // z越小 离人眼越近
+    if (oldZIndex > zIndex) {
+        setZBufferWithPosition(x, y, zIndex);
+        return true;
+    }
+    return false;
 }
 
 // 画渐变三角形
@@ -59,6 +93,9 @@ function drawTriangle(vertex1: Vec4, vertex2: Vec4, vertex3: Vec4) {
                 barycentricCoord.z < 0
             )
                 continue;
+
+            const z = vertex1.z * barycentricCoord.x + vertex2.z * barycentricCoord.y + vertex3.z * barycentricCoord.z;
+            if (!zBufferTest(x, y, z)) continue;
             writeColor(frameData, x, y, width, lerp(barycentricCoord, Color.RED, Color.GREEN, Color.BLUE));
         }
     }
@@ -83,6 +120,8 @@ function drawMesh(modelMat: Mat4) {
         NDC(windowPos2);
         NDC(windowPos3);
 
+        if (faceCulling(windowPos1, windowPos2, windowPos3)) continue;
+
         const viewportMat = getViewPortVertex(width, height);
 
         // 视口变换
@@ -101,6 +140,17 @@ function NDC(position: Vec4) {
     position.z = (position.z + 1) * 0.5;
 }
 
+// 面剔除
+function faceCulling(v1: Vec4, v2: Vec4, v3: Vec4) {
+    const line1 = v2.sub(v1);
+    const line2 = v3.sub(v1);
+
+    const normal = line1.cross(line2).normalize();
+    const view = new Vec4(0, 0, 1);
+    const dot = normal.dot(view);
+    return dot < 0;
+}
+
 let angle = 0;
 const update = () => {
     angle += 1;
@@ -111,6 +161,7 @@ const update = () => {
         Mat4.getRotationMat4Z(angle),
     ]);
     clear(canvas, ctx, frameBuffer, Color.BLACK);
+    clearZBuffer();
     drawMesh(modelMat);
     render(canvas, ctx, frameBuffer);
     requestAnimationFrame(update);

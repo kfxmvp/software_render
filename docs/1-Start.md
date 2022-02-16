@@ -200,8 +200,7 @@ render(canvas, ctx, frameBuffer);
 ```
 ![结果](./textures/start_1.png)
 
-可以看出(0,0)点在左上角，x往右为正轴,y往下为正轴，是**右手系**，所以我们的坐标系如下图：
-![坐标系](./textures/start_2.png)
+可以看出(0,0)点在左上角，x往右为正轴,y往下为正轴，是**右手系**
 
 
 2. 实现x列,y行的像素颜色值读取和写入
@@ -438,8 +437,3 @@ export function normalization(vec:Vec4):Vec4{
 vec.x *= width;
 vec.y *= height;
 ```
-
-强烈建议先学习 [仿射变换和齐次坐标][1]，以及[左手系vs右手系][2]
-
-[1]:https://www.bilibili.com/video/BV1X7411F744?p=3 
-[2]:https://zhuanlan.zhihu.com/p/64707259

@@ -63,7 +63,7 @@ export class Camera {
     }
 
     /**
-     * 相机z轴 （相机position到lookAt的向量 取反）
+     * 相机z轴 （相机lookAt到position的向量）
      *         g
      * z = -  ---
      *       ||g||
