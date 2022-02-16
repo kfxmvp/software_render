@@ -135,8 +135,11 @@
 - aspect 宽高比
 
 1. 正交投影
+
 ![正交投影-1](./textures/camera_9.png)
+
 ![正交投影-2](./textures/camera_6.png)
+
 先把一个[left,right] x [bottom,top] x [far,near]的立方体，平移+缩放至一个[-1,1]的规则立方体中（为什么要这么做？目的就是为了方便计算）
 
 ```
@@ -167,8 +170,11 @@
 ```
 
 2. 透视投影
+
 ![透视投影-1](./textures/camera_7.png)
+
 ![透视投影-2](./textures/camera_8.png)
+
 ```
     /**
      * 获取透视投影矩阵 
