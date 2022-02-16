@@ -3,6 +3,8 @@
 2. 输出一个有颜色过渡的3D正方体在屏幕上，并自动按x/y/z任意方向旋转
 ![结果图](./textures/camera_12.gif)
 
+完整实现可参见`demos/2-Camera`
+
 ## 准备工作
 开始此节前，强烈建议学习Games101第3-4节，理解仿射变化，齐次坐标等概念，并对矩阵/向量运算有清晰认识
 ### **1.参考资料**
@@ -488,6 +490,18 @@ function drawTriangle(vertex1: Vec4, vertex2: Vec4, vertex3: Vec4) {
     }
 }
 ```
+
+每帧清除zBuffer
+```
+const update = () => {
+    // 省略上面代码
+    clearZBuffer();
+    drawMesh(modelMat);
+    render(canvas, ctx, frameBuffer);
+    requestAnimationFrame(update);
+}
+```
+
 ![深度检测效果](./textures/camera_12.gif)
 
 ### **2. 背面剔除**

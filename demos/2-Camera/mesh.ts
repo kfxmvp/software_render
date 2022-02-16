@@ -37,7 +37,6 @@ export class Mesh {
         leftBottom: Vec4,
         rightBottom: Vec4,
         rightTop: Vec4,
-        normal: Vec4
     ) {
         const mesh = new Mesh();
         const points = [leftTop, leftBottom, rightBottom, rightTop];
@@ -45,23 +44,6 @@ export class Mesh {
         for (let i = 0; i < 4; ++i) {
             const vertex = new Vertex();
             vertex.position = points[i].clone();
-            vertex.normal = normal.clone();
-            if (i == 0) {
-                vertex.u = 0;
-                vertex.v = 0;
-            }
-            else if (i == 1) {
-                vertex.u = 0;
-                vertex.v = 1;
-            }
-            else if (i == 2) {
-                vertex.u = 1;
-                vertex.v = 1;
-            }
-            else if (i == 3) {
-                vertex.u = 1;
-                vertex.v = 0;
-            }
             vertexes.push(vertex);
 
         }
@@ -71,7 +53,7 @@ export class Mesh {
     }
 
     private createPlaneWithArray(points: Array<Vec4>) {
-        this.createRect(points[0], points[1], points[2], points[3], points[4]);
+        this.createRect(points[0], points[1], points[2], points[3]);
     }
 
     /**

@@ -29,35 +29,11 @@ export class Vec4 {
         return vec4;
     }
 
-    public add(v1: Vec4, out?: Vec4): Vec4 {
-        if (!out) out = new Vec4();
-        out.x = this.x + v1.x;
-        out.y = this.y + v1.y;
-        out.z = this.z + v1.z;
-        return out;
-    }
-
     public sub(v1: Vec4, out?: Vec4): Vec4 {
         if (!out) out = new Vec4();
         out.x = this.x - v1.x;
         out.y = this.y - v1.y;
         out.z = this.z - v1.z;
-        return out;
-    }
-
-    public mul(v1: Vec4, out?: Vec4): Vec4 {
-        if (!out) out = new Vec4();
-        out.x = this.x * v1.x;
-        out.y = this.y * v1.y;
-        out.z = this.z * v1.z;
-        return out;
-    }
-
-    public div(v1: Vec4, out?: Vec4): Vec4 {
-        if (!out) out = new Vec4();
-        out.x = this.x / v1.x;
-        out.y = this.y / v1.y;
-        out.z = this.z / v1.z;
         return out;
     }
 
@@ -90,12 +66,6 @@ export class Vec4 {
         return out;
     }
 
-    public cross2Num(v1: Vec4): number {
-        const { x: x1, y: y1 } = this;
-        const { x: x2, y: y2 } = v1;
-        return x1 * y2 - x2 * y1;
-    }
-
     /**归一化 */
     public normalize(): Vec4 {
         const { x, y, z, w } = this;
@@ -115,21 +85,6 @@ export class Vec4 {
         this.y /= this.w;
         this.z /= this.w;
         this.w = 1;
-        return this;
-    }
-
-    public mul3(num: number): Vec4 {
-        this.x *= num;
-        this.y *= num;
-        this.z *= num;
-        return this;
-    }
-
-    public mul4(num: number): Vec4 {
-        this.x *= num;
-        this.y *= num;
-        this.z *= num;
-        this.w *= num;
         return this;
     }
 
