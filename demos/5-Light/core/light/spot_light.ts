@@ -47,13 +47,14 @@ export class SpotLight extends Light {
         const spotDir = _direction.clone().mul3(-1).normalize();
         // 计算lightDir和spotDir夹角的余弦值
         const cosTheta = lightDir.dotVec3(spotDir);
-        // const cosCutoff = Math.cos((Math.PI / 180) * ._cutOffAngle);
+        const cosCutoff = Math.cos((Math.PI / 180) * _cutOffAngle);
+        const cosOutCutoff = Math.cos((Math.PI / 180) * this._outCutOffAngle);
 
         // // 角度小于切光角 但因为用的是余弦值 余弦值在角度越小时 值越大 所以是 > 而不是 < 
         // return cosTheta > cosCutoff ? super.calc(viewDir,lightDir,normal) : Color.BLACK.clone();
-        const epsilon = _cutOffAngle - _outOffAngle;
-        const intensity = CalcUtil.clamp((cosTheta - _outOffAngle) / epsilon, 0.0, 1.0);
+        const epsilon = cosCutoff - cosOutCutoff;
+        const intensity = CalcUtil.clamp((cosTheta - cosOutCutoff) / epsilon, 0.0, 1.0);
 
-        return super.calc(normal, lightDir, viewDir).mul3(intensity);
+        return super.calc(viewDir, lightDir, normal).mul3(intensity);
     }
 }

@@ -1,27 +1,25 @@
-import { Loader } from "./core/loader";
 import { Raster } from "./core/raster";
 import { Scene } from "./core/scene";
 import { Node } from "./core/node";
-// @ts-ignore
-import Model1 from "./resources/model1.obj";
-// @ts-ignore
-import Model1Tex from "./resources/model1.png";
-// @ts-ignore
-import Model2 from "./resources/model2.obj";
-// @ts-ignore
-import Model2Tex from "./resources/model2.png";
-// @ts-ignore
-import Model3 from "./resources/model3.obj";
-// @ts-ignore
-import Model3Tex from "./resources/model3.png";
 import { Material } from "./core/material";
 import { Shader } from "./core/shader/shader";
 import { Texture } from "./core/texture";
 import { CalcUtil } from "./base/util/calc";
 import { Mat4 } from "./base/mat4";
-import { Light } from "./core/light/light";
 import { Vec4 } from "./base/vec4";
 import { Color } from "./base/color";
+import { Mesh } from "./core/mesh";
+import { Model } from "./core/model/model";
+import { ModelObject } from "./core/model/object";
+import { Light } from "./core/light/light";
+import { DirectLight } from "./core/light/direct_light";
+import { PointLight } from "./core/light/point_light";
+import { SpotLight } from "./core/light/spot_light";
+
+// @ts-ignore
+import Tex1 from "./resources/1.jpg";
+// @ts-ignore
+import Tex2 from "./resources/2.jpg";
 
 const scene = new Scene();
 const camera = scene.camera;
@@ -33,22 +31,65 @@ camera.near = 1;
 camera.far = 100;
 
 // 灯光
-const light = new Light();
-light.setColor(Color.RED.clone());
-light.setPosition(new Vec4(10, 0, 0, 1));
-light.setIntensity(0.6);
-
-// 环境光
-light.useAmbient();
-light.setAmbientColor(Color.WHITE.clone());
-light.setAmbientIntensity(0.3);
-
-// 镜面高光
-light.setSpecularColor(Color.WHITE.clone());
-light.setSpecularIntensity(0.5);
+let light: DirectLight | PointLight | SpotLight;
 
 const raster = new Raster();
 const { width, height } = raster;
+
+// 使用平行光
+const useDirectLight = () => {
+    light = new DirectLight();
+    light.setColor(Color.WHITE.clone());
+    light.setDirection(new Vec4(-0.2, -1, -0.3, 0));
+    light.setPosition(new Vec4(10, 0, 0, 1));
+    light.setIntensity(1);
+
+    // 环境光
+    light.useAmbient();
+    light.setAmbientColor(Color.WHITE.clone());
+    light.setAmbientIntensity(0.1);
+
+    // 镜面高光
+    light.setSpecularColor(Color.WHITE.clone());
+    light.setSpecularIntensity(0.5);
+}
+
+// 使用点光源
+const usePointLight = () => {
+    light = new PointLight();
+    light.setColor(Color.WHITE.clone());
+    light.setPosition(new Vec4(-2, 0, 0, 1));
+    light.setIntensity(1);
+
+    // 环境光
+    light.useAmbient();
+    light.setAmbientColor(Color.WHITE.clone());
+    light.setAmbientIntensity(0.1);
+
+    // 镜面高光
+    light.setSpecularColor(Color.WHITE.clone());
+    light.setSpecularIntensity(0.5);
+}
+
+// 使用聚光灯
+const useSpotLight = () => {
+    light = new SpotLight();
+    light.setColor(Color.WHITE.clone());
+    light.setPosition(new Vec4(0, 0, 5, 1));
+    light.setDirection(new Vec4(0, 0, -1, 0));
+    light.setCutoffAngle(5);
+    light.setCutOutOffAngle(7.5);
+    light.setIntensity(1);
+
+    // 环境光
+    light.useAmbient();
+    light.setAmbientColor(Color.WHITE.clone());
+    light.setAmbientIntensity(0.1);
+
+    // 镜面高光
+    light.setSpecularColor(Color.WHITE.clone());
+    light.setSpecularIntensity(0.5);
+}
 
 let angle = 0;
 let autoRotation = true;
@@ -64,7 +105,9 @@ const dealAutoRotation = () => {
             // 更新model矩阵
             shader.modelMatrix = CalcUtil.mat4MulArr([
                 child.positionMat4,
-                Mat4.getRotationMat4X(angle)
+                Mat4.getRotationMat4X(angle),
+                // Mat4.getRotationMat4Y(angle),
+                // Mat4.getRotationMat4Z(angle),
             ])
         }
     })
@@ -73,41 +116,43 @@ const dealAutoRotation = () => {
 let loaded = false;
 const loadResource = async () => {
     const node = new Node();
-    // 加载模型
-    const model1 = await Loader.loadModel(Model1);
-    node.model = model1;
-    const { object: objects } = model1;
+    const mesh = new Mesh();
+    const model = new Model();
+    const object = new ModelObject();
+    const material = new Material();
+    const shader = new Shader();
+    const texture = new Texture();
 
-    for (let i = 0; i < objects.length; ++i) {
-        const object = objects[i];
-        const material = object.getMaterial() || new Material();
-        const shader = material.getShader() || new Shader();
-        if (!material.getShader()) material.setShader(shader);
+    node.model = model;
 
-        // 模型贴图
-        const texture = new Texture();
-        await texture.setImageDataWithSrc(Model1Tex);
-        material?.setTexture(texture);
+    mesh.createBox(new Vec4(0, 0, 0), 1);
+    object.setMaterial(material);
+    object.setMesh(mesh);
 
-        // 材质参数
-        shader.addUniform('camera', camera);
-        shader.addUniform('light', light);
+    model.addObject(object);
 
-        // mvp矩阵
-        shader.modelMatrix = CalcUtil.mat4MulArr([
-            node.positionMat4,
-            Mat4.getRotationMat4X(angle)
-        ])
+    await texture.setImageDataWithSrc(Tex1);
+    material.setShader(shader);
+    material.setTexture(texture);
 
-        shader.viewMatrix = camera.getViewMatrix();
+    // 材质参数
+    shader.addUniform('camera', camera);
+    shader.addUniform('light', light);
 
-        const { near, far, fov } = camera;
-        const aspect = width / height;
+    // mvp矩阵
+    shader.modelMatrix = CalcUtil.mat4MulArr([
+        node.positionMat4,
+        Mat4.getRotationMat4X(angle)
+    ])
 
-        shader.projectionMatrix = camera.isOrthographicCamera()
-            ? camera.getOrthographicMatrix(-width / 2, width / 2, height / 2, -height / 2, near, far)
-            : camera.getPerspectiveMatrix(fov, aspect, near, far);
-    }
+    shader.viewMatrix = camera.getViewMatrix();
+
+    const { near, far, fov } = camera;
+    const aspect = width / height;
+
+    shader.projectionMatrix = camera.isOrthographicCamera()
+        ? camera.getOrthographicMatrix(-width / 2, width / 2, height / 2, -height / 2, near, far)
+        : camera.getPerspectiveMatrix(fov, aspect, near, far);
 
     scene.addChild(node);
 }
@@ -121,5 +166,9 @@ const update = () => {
 }
 
 loadResource().then(() => loaded = true)
+
+useDirectLight();
+// usePointLight();
+// useSpotLight();
 
 update();

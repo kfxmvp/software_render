@@ -20,18 +20,17 @@ export class PointLight extends Light {
 
     /**计算光照信息 用phong模型 */
     public calc(viewDir: Vec4, worldPosition: Vec4, normal: Vec4): Color {
-        const { _constant: constant, _linear: linear, _quadratic: quadratic } = this;
+        const { _constant, _linear, _quadratic } = this;
         // 片元到光源的距离
         const distance = this._position.sub(worldPosition).length;
 
         // 光照衰减系数
-        const attenuation =
-            1 / (constant + linear * distance + quadratic * (distance * distance));
+        const attenuation = 1 / (_constant + _linear * distance + _quadratic * (distance * distance));
 
         //片元到光的反向，拿光的位置减去片元的位置即worldPos
         const lightDir = this._position.sub(worldPosition).normalize();
-        
-        const result = super.calc(normal, lightDir, viewDir);
+
+        const result = super.calc(viewDir, lightDir, normal);
 
         // 进行光照衰减
         return result.mul3(attenuation);
