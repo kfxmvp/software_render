@@ -1,10 +1,10 @@
 import { Color } from "../../base/color";
+import { Light, LightType } from "../light/light";
 import { Mat4 } from "../../base/mat4";
 import { CalcUtil } from "../../base/util/calc";
 import { Vertex } from "../../base/vertex";
-import { AmbientLight } from "../light/ambient_light";
-import { Light } from "../light/light";
-import { Loader } from "../loader/loader";
+import { Camera } from "../camera";
+import { Loader } from "../loader";
 import { Texture } from "../texture";
 import { Vert2Frag } from "./vertex_to_fragment";
 
@@ -102,37 +102,22 @@ export class Shader {
 
     /**片元着色 */
     public fragmentShader(vert2frag: Vert2Frag): Color {
+        const { u, v, color: vColor, wordPosition, normal } = vert2frag;
         const color = new Color();
-        if (!!this._texture) color.setWithColor(this._texture.getColorWithUV(vert2frag.u, vert2frag.v))
-        else color.setWithColor(vert2frag.color)
+        if (!!this._texture) color.setWithColor(this._texture.getColorWithUV(u, v))
+        else color.setWithColor(vColor)
 
-        const ambientLight = this.getUniform('ambient') as AmbientLight;
-        let ambient: Color;
-        let diffuse: Color;
         const light = this.getUniform('light') as Light;
-        if (ambientLight) {
-            ambient = ambientLight.getColor();
-        }
-        if (light) {
-            //片元到光的反向，拿光的位置减去片元的位置即worldPos
-            const lightDir = light.getPosition().sub(vert2frag.wordPosition).normalize();
-            //用法向量 点乘 片元到光的方向 就是余弦值
-            const cos = vert2frag.normal.dot(lightDir);
-            //漫反射
-            diffuse = light.getColor().clone().mul3(Math.max(cos, 0));
-        }
-        if (ambient && diffuse) {
-            color.mul(ambient.add(diffuse), color)
-        }
-        else if (ambient) {
-            color.mul(ambient, color);
-        }
-        else if (diffuse) {
-            color.mul(diffuse, color);
+        const camera = this.getUniform('camera') as Camera;
+        if (light && camera) {
+            const viewDir = camera.position.sub(wordPosition).normalize();
+            const phongColor = light.calc(viewDir, wordPosition, normal);
+            color.mul(phongColor, color);
         }
         return color;
     }
 
+    // 法线矩形
     private _getNormalMatrix(): Mat4 {
         const res = this._modelMatrix.invert();
         res.transpose();

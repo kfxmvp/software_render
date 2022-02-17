@@ -6,9 +6,6 @@ import { Loader } from "../loader";
 import { Texture } from "../texture";
 import { Vert2Frag } from "./vertex_to_fragment";
 export class Shader {
-    constructor() {
-    }
-
     // 模型矩阵
     private _modelMatrix: Mat4;
     public set modelMatrix(matrix: Mat4) {
@@ -78,8 +75,6 @@ export class Shader {
         v2f.u *= v2f.Z;
         v2f.v *= v2f.Z;
 
-        v2f.normal = CalcUtil.vec4MulMat4(v2f.normal.clone(), this._getNormalMatrix()).normalize();
-
         return v2f;
     }
 
@@ -89,11 +84,5 @@ export class Shader {
         if (!!this._texture) color.setWithColor(this._texture.getColorWithUV(vert2frag.u, vert2frag.v))
         else color.setWithColor(vert2frag.color)
         return color;
-    }
-
-    private _getNormalMatrix(): Mat4 {
-        const res = this._modelMatrix.invert();
-        res.transpose();
-        return res;
     }
 }

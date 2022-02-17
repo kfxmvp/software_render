@@ -22,6 +22,33 @@ export class Light {
         else this._direction.set(direction.x, direction.y, direction.z, direction.w);
     }
 
+    /**是否使用环境光 */
+    protected _useAmbient: boolean;
+    public get useAmbient(): boolean {
+        return this._useAmbient;
+    }
+    public set useAmbient(use: boolean) {
+        this._useAmbient = use;
+    }
+
+    /**环境光颜色 */
+    protected _ambientColor: Color;
+    public get ambientColor(): Color {
+        return this._ambientColor;
+    }
+    public set ambientColor(color: Color) {
+        this._ambientColor = color;
+    }
+
+    /**环境光系数 */
+    protected _ambientIntensity: number;
+    public get ambientIntensity(): number {
+        return this._ambientIntensity;
+    }
+    public set ambientIntensity(intensity: number) {
+        this._ambientIntensity = intensity;
+    }
+
     /**光源颜色 */
     protected _color: Color;
     public getColor() {
@@ -72,5 +99,8 @@ export class Light {
         this._diffuseColor = new Color();
         this._specularColor = new Color();
         this._intensity = 1;
+        this._useAmbient = true;
+        this._ambientColor = Color.WHITE.clone();
+        this._ambientIntensity = 0.3;
     }
 }
