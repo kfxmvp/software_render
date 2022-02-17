@@ -2,27 +2,11 @@ import { Color } from "../../base/color";
 import { Mat4 } from "../../base/mat4";
 import { CalcUtil } from "../../base/util/calc";
 import { Vertex } from "../../base/vertex";
-import { Loader } from "../loader/loader";
+import { Loader } from "../loader";
 import { Texture } from "../texture";
 import { Vert2Frag } from "./vertex_to_fragment";
-
-export type ShaderUniform = Record<string, any>;
 export class Shader {
-    constructor(uniform?: ShaderUniform) {
-        if (uniform) this._uniform = uniform;
-        else this._uniform = {};
-    }
-
-    private _uniform: ShaderUniform;
-    public addUniform(key: string, value: any) {
-        if (this._uniform[key]) return;
-        this._uniform[key] = value;
-    }
-    public getUniform(key: string) {
-        return this._uniform[key];
-    }
-    public modifyUniform(key: string, value: any) {
-        this._uniform[key] = value;
+    constructor() {
     }
 
     // 模型矩阵
@@ -52,6 +36,7 @@ export class Shader {
         return this._projectionMatrix;
     }
 
+    // 贴图
     private _texture: Texture;
     public async setTextureWithPath(path: string) {
         if (!this._texture) this._texture = new Texture();

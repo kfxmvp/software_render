@@ -12,6 +12,7 @@
 我理解，uv坐标，就是三维的物体上任意一点，在二维纹理的映射，我们可以用uv从二维的纹理上获取纹素，来渲染三维物体对应点的颜色，这样一张纹理贴图，就被贴在了三维模型上
 
 实际开发过程中，模型顶点存储的uv，以及其对应的纹理，其实是建模/美术人员在美术软件中完成的，我们只需要拿来用就好，本节内容也给定一个简单的映射关系
+
 - (u,v)坐标的范围均为[0,1]
 - u和纹理坐标x的对应关系为：`x = u * 贴图宽 - 0.5`
 - v和纹理坐标y的对应关系为：`y = (1 - v) * 贴图高 - 0.5`
@@ -22,6 +23,7 @@
  const y = (1 - v) * texture.height - 0.5;
 ```
 ### **贴图**
+
 1. 加载贴图
 ```
 export async function loadImage(path: string): Promise<ImageData> {
@@ -100,7 +102,9 @@ export class Texture {
 ```
 
 ### **修改渲染器**
+
 1. 创建并初始化贴图
+
 ```
 let textureLoaded = false;
 const texture = new Texture();
@@ -120,7 +124,8 @@ export class Vertex {
 }
 ```
 
-3. 创建Box的时候，初始化顶点uv
+3. 创建`Box`的时候，初始化顶点`uv`
+
 ```
  createRect(
         leftTop: Vec4,
@@ -157,6 +162,7 @@ export class Vertex {
 ```
 
 4. 修改`drawTriangle`
+
 - 入参类型修改为`Vertex`，并将使用坐标的地方，均替换为`vertex.position`
 - 加载贴图后，使用贴图纹素渲染对应像素颜色
 
@@ -203,7 +209,9 @@ function drawTriangle(vertex1: Vertex, vertex2: Vertex, vertex3: Vertex) {
 ```
 
 5. 修改`drawMesh`
+
 创建新的顶点数据，position保存mvp变换+viewport变换后的屏幕坐标，并拷贝原有顶点的uv
+
 ```
 // 画网格
 function drawMesh(modelMat: Mat4) {

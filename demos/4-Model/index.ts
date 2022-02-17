@@ -1,4 +1,4 @@
-import { Loader } from "./core/loader/loader";
+import { Loader } from "./core/loader";
 import { Raster } from "./core/raster";
 import { Scene } from "./core/scene";
 import { Node } from "./core/node";
@@ -34,17 +34,7 @@ const raster = new Raster();
 const { width, height } = raster;
 
 let angle = 0;
-let loaded = false;
 let autoRotation = true;
-
-const update = () => {
-    if (loaded) {
-        if (autoRotation) dealAutoRotation();
-        raster.render(scene);
-    }
-    requestAnimationFrame(update);
-}
-
 const dealAutoRotation = () => {
     angle += 1;
     scene.children.forEach(child => {
@@ -62,6 +52,7 @@ const dealAutoRotation = () => {
     })
 }
 
+let loaded = false;
 const loadResource = async () => {
     const node = new Node();
     // 加载模型
@@ -96,6 +87,14 @@ const loadResource = async () => {
     }
 
     scene.addChild(node);
+}
+
+const update = () => {
+    if (loaded) {
+        if (autoRotation) dealAutoRotation();
+        raster.render(scene);
+    }
+    requestAnimationFrame(update);
 }
 
 loadResource().then(() => loaded = true)

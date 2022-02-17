@@ -1,14 +1,10 @@
-import { Vec4 } from "../../base/vec4";
-import { Vertex } from "../../base/vertex";
-import { Material } from "../material";
-import { Face } from "../model/face";
-import { Model } from "../model/model";
-import { ModelObject } from "../model/object";
-import { Shader } from "../shader/shader";
-
-export enum LoaderResourceType {
-    Image
-}
+import { Vec4 } from "../base/vec4";
+import { Vertex } from "../base/vertex";
+import { Material } from "./material";
+import { Face } from "./model/face";
+import { Model } from "./model/model";
+import { ModelObject } from "./model/object";
+import { Shader } from "./shader/shader";
 
 export class Loader {
     public static async loadImage(path: string): Promise<ImageData> {

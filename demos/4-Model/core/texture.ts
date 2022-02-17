@@ -1,5 +1,5 @@
 import { Color } from "../base/color";
-import { Loader } from "./loader/loader";
+import { Loader } from "./loader";
 
 export class Texture {
     private _imageData: ImageData;

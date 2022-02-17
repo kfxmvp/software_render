@@ -31,6 +31,7 @@
 
 ## **工作开始**
 ### **1. 实现相机**
+
 现实生活中，我们为了将眼镜观察到的物体，展现在2D的屏幕/相纸上，发明了照相机
 
 而在计算机图形学中，为了将三维物体映射在二维的屏幕上，则沿用了照相机这个概念
@@ -42,15 +43,19 @@
 - 茄子（projection transformation/投影变换）
 
 #### **如何建立相机坐标系？**
+
 ![相机坐标系](./textures/camera_2.png)
+
 - position（相机放在什么位置） 
 - lookAt （相机往哪看）向量g
 - up （相机的向上方向）向量t
 
 要建立摄像机坐标系，需要先确定观察方向，即需要确定position和lookAt
+
 - position-lookAt得到相机-z轴
 - -z轴叉乘 (0,1,0)向量得到相机x轴
 - 相机z轴叉乘x轴，得到相机y轴
+
 ```
     /**
      * 相机x轴
@@ -96,11 +101,13 @@
 ```
 
 #### **视图变换**
+
 我们还有一个常识，就是保持相同运动的物体间，是相对静止的；
 
 假设相机和要拍摄的物体都保持相同的运动，那么拍摄出来的照片，应该是始终相同的
 
 利用这个特性，计算机图形学中为了方便计算，常常做如下设定：
+
 - 相机位置(position)放在坐标系原点(0,0,0)上
 - lookAt看向-z
 - up则与y轴重合
@@ -117,20 +124,24 @@
 - 将（向量g x 向量t)旋转到X轴
 
 平移矩阵很好写，就是齐次坐标的最后一列分别为`-position.x,-position.y,-position.z,1`
+
 ![平移相机position到原点](./textures/camera_4.png)
 
 再看旋转过程，用矩阵表达就非常困难；但咱们知道，变换是可逆的，那我们把上面的过程反过来，然后再求逆，是不是就可以呢？
 
 答案是肯定的，我们把上面的旋转过程表示为
+
 - 将X轴 旋转到（向量g x 向量t)
 - 将Y轴 旋转到 up（向量t）
 - 将-Z轴 旋转到 lookAt（向量g）
 - 求矩阵的逆（因为旋转矩阵是正交矩阵，所以矩阵的逆 == 矩阵的转置）
 
 这样，相机的视图变换数学表示，我们就得到了
+
 ![旋转相机三个轴到世界坐标轴](./textures/camera_5.png)
 
 #### **投影变换**
+
 - near 近平面
 - far 远平面
 - fov 视场角
@@ -208,8 +219,10 @@
 
 
 ### **2. 实现网格**
+
 - VBO存储顶点数据
 - EBO存储顶点的顺序
+
 ```
 // 顶点数据 存储顶点位置 
 export class Vertex {
@@ -230,8 +243,17 @@ export class Mesh {
 }
 ```
 ### **3. 画正方体**
+
 ```
-   /**
+export class Mesh {
+    public VBO: Array<Vertex>;
+    public EBO: Array<number>;
+    constructor() {
+        this.VBO = new Array();
+        this.EBO = new Array();
+    }
+
+    /**
      * 创建三角形
      */
     createTriangle(v1: Vertex, v2: Vertex, v3: Vertex) {
@@ -259,7 +281,6 @@ export class Mesh {
         leftBottom: Vec4,
         rightBottom: Vec4,
         rightTop: Vec4,
-        normal: Vec4
     ) {
         const mesh = new Mesh();
         const points = [leftTop, leftBottom, rightBottom, rightTop];
@@ -267,23 +288,6 @@ export class Mesh {
         for (let i = 0; i < 4; ++i) {
             const vertex = new Vertex();
             vertex.position = points[i].clone();
-            vertex.normal = normal.clone();
-            if (i == 0) {
-                vertex.u = 0;
-                vertex.v = 0;
-            }
-            else if (i == 1) {
-                vertex.u = 0;
-                vertex.v = 1;
-            }
-            else if (i == 2) {
-                vertex.u = 1;
-                vertex.v = 1;
-            }
-            else if (i == 3) {
-                vertex.u = 1;
-                vertex.v = 0;
-            }
             vertexes.push(vertex);
 
         }
@@ -293,7 +297,7 @@ export class Mesh {
     }
 
     private createPlaneWithArray(points: Array<Vec4>) {
-        this.createRect(points[0], points[1], points[2], points[3], points[4]);
+        this.createRect(points[0], points[1], points[2], points[3]);
     }
 
     /**
@@ -328,6 +332,8 @@ export class Mesh {
             new Vec4(x + radius, y + radius, z - radius, 1),
         ];
 
+        // TODO 面顶点顺序为什么和面剔除有关 理清楚关系
+
         // 前
         this.createPlaneWithArray([0, 1, 2, 3].map(idx => points[idx]).concat(new Vec4(0, 0, 1)));
         // 后
@@ -341,10 +347,14 @@ export class Mesh {
         // 下
         this.createPlaneWithArray([1, 5, 6, 2].map(idx => points[idx]).concat(new Vec4(0, -1, 0)));
     }
+}
 ```
 ### **4. 旋转正方体**
+
 ![旋转矩阵](./textures/camera_10.png)
+
 1. X轴旋转矩阵
+
 ```
     /**
      * 获取绕X轴旋转 旋转矩阵
@@ -369,7 +379,9 @@ export class Mesh {
         return mat;
     }
 ```
+
 2. Y轴旋转矩阵
+
 ```
     /**
      * 获取绕Y轴旋转 旋转矩阵
@@ -394,7 +406,9 @@ export class Mesh {
         return mat;
     }
 ```
+
 3. Z轴旋转矩阵
+
 ```
     /**
      * 获取绕Z轴旋转 旋转矩阵
@@ -419,11 +433,14 @@ export class Mesh {
         return mat;
     }
 ```
+
 4. 将mvp矩阵中的model矩阵，更换为旋转矩阵，每帧增加angle，达到Box转动的效果
+
 ![无深度检测和背面剔除效果](./textures/camera_1.gif)
 
 ## **进阶学习**
 ### **1. 深度检测**
+
 我们可以观察到，上述流程渲染出来的结果，在旋转时看起来有点奇怪，像是后面的面透了过来，不符合前面遮挡后面这一物理规律
 
 那这是为什么呢？
@@ -505,6 +522,7 @@ const update = () => {
 ![深度检测效果](./textures/camera_12.gif)
 
 ### **2. 背面剔除**
+
 立方体有6个面，但是任意时间，我们只能看到3个面，我们完全可以只渲染能看到的3个面，减少多余的面的渲染，提高渲染效率
 
 1. 如何定义正面和背面？
@@ -544,4 +562,5 @@ function drawMesh(modelMat: Mat4) {
     }
 }
 ```
+
 ![背面剔除效果](./textures/camera_12.gif)
