@@ -77,16 +77,6 @@ export class Light {
         this._intensity = intensity;
     }
 
-    /**漫反射颜色 */
-    protected _diffuseColor: Color;
-    public getDiffuseColor(): Color {
-        return this._diffuseColor;
-    }
-    public setDiffuseColor(color: Color) {
-        if (!this._diffuseColor) this._diffuseColor = color.clone()
-        else this._diffuseColor.set(color.r, color.g, color.b, color.a);
-    }
-
     /**镜面光颜色 */
     protected _specularColor: Color;
     public getSpecularColor(): Color {
@@ -106,13 +96,13 @@ export class Light {
         this._specularIntensity = intensity;
     }
 
-    /**计算光照信息 用phong模型 */
+    /**计算光照信息 用Phong模型 */
     public calc(viewDir: Vec4, lightDir: Vec4, normal: Vec4): Color {
-        // 折射方向
+        // 反射方向
         const reflectDir = CalcUtil.reflect(lightDir, normal);
 
         // 环境光
-        const ambient = this._useAmbient ? this._ambientColor : new Color();
+        const ambient = this._useAmbient ? this._ambientColor.mul3(this._ambientIntensity) : new Color();
 
         //用法向量 点乘 片元到光的方向 就是余弦值
         const cos = normal.normalize().dotVec3(lightDir);
@@ -136,9 +126,6 @@ export class Light {
         this._useAmbient = true;
         this._ambientColor = Color.WHITE.clone();
         this._ambientIntensity = 1;
-
-        // 漫反射设置
-        this._diffuseColor = new Color();
 
         // 高光设置
         this._specularColor = new Color();

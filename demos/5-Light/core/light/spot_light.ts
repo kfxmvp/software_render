@@ -38,20 +38,24 @@ export class SpotLight extends Light {
         this._cutOffAngle = 0;
     }
 
-    /**计算光照信息 用phong模型 */
+    /**计算光照信息 用Phong模型 */
     public calc(viewDir: Vec4, wordPosition: Vec4, normal: Vec4): Color {
         const { _position, _direction, _cutOffAngle, _outCutOffAngle: _outOffAngle } = this;
+        
         //首先计算了lightDir和取反的direction向量
         const lightDir = _position.sub(wordPosition).normalize();
         //取反的是因为我们想让向量指向光源而不是从光源出发
         const spotDir = _direction.clone().mul3(-1).normalize();
         // 计算lightDir和spotDir夹角的余弦值
         const cosTheta = lightDir.dotVec3(spotDir);
+
         const cosCutoff = Math.cos((Math.PI / 180) * _cutOffAngle);
         const cosOutCutoff = Math.cos((Math.PI / 180) * this._outCutOffAngle);
 
-        // // 角度小于切光角 但因为用的是余弦值 余弦值在角度越小时 值越大 所以是 > 而不是 < 
+        // 角度小于切光角 但因为用的是余弦值 余弦值在角度越小时 值越大 所以是 > 而不是 < 
         // return cosTheta > cosCutoff ? super.calc(viewDir,lightDir,normal) : Color.BLACK.clone();
+
+        // 边缘平滑处理
         const epsilon = cosCutoff - cosOutCutoff;
         const intensity = CalcUtil.clamp((cosTheta - cosOutCutoff) / epsilon, 0.0, 1.0);
 

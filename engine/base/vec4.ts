@@ -63,13 +63,23 @@ export class Vec4 {
     }
 
     /**
-     * 点乘
+     * 点乘 只计算xyz
      * x1*x2 + y1*y2 + z1*z2
      */
-    public dot(v1: Vec4): number {
+    public dotVec3(v1: Vec4): number {
         const { x: x1, y: y1, z: z1 } = this;
         const { x: x2, y: y2, z: z2 } = v1;
         return x1 * x2 + y1 * y2 + z1 * z2;
+    }
+
+    /**
+    * 点乘 计算xyzw
+    * x1*x2 + y1*y2 + z1*z2
+    */
+    public dotVec4(v1: Vec4): number {
+        const { x: x1, y: y1, z: z1, w: w1 } = this;
+        const { x: x2, y: y2, z: z2, w: w2 } = v1;
+        return x1 * x2 + y1 * y2 + z1 * z2 + w1 * w2;
     }
 
     /**

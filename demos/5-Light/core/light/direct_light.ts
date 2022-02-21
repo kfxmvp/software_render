@@ -19,7 +19,7 @@ export class DirectLight extends Light {
         this._type = LightType.Direct;
     }
 
-    /**计算光照信息 用phong模型 */
+    /**计算光照信息 用Phong模型 */
     public calc(viewDir: Vec4, worldPosition: Vec4, normal: Vec4): Color {
         return super.calc(viewDir, this._direction.clone().mul3(-1).normalize(), normal);
     }

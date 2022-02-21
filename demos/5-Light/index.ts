@@ -17,9 +17,9 @@ import { PointLight } from "./core/light/point_light";
 import { SpotLight } from "./core/light/spot_light";
 
 // @ts-ignore
-import Tex1 from "./resources/1.jpg";
+import Tex1 from "./resources/1.png";
 // @ts-ignore
-import Tex2 from "./resources/2.jpg";
+import Tex2 from "./resources/2.png";
 
 const scene = new Scene();
 const camera = scene.camera;
@@ -36,6 +36,24 @@ let light: DirectLight | PointLight | SpotLight;
 const raster = new Raster();
 const { width, height } = raster;
 
+// 使用基础灯光
+const useBaseLight = () => {
+    // @ts-ignore
+    light = new Light();
+    light.setColor(Color.WHITE.clone());
+    light.setPosition(new Vec4(0, 0, 0, 1));
+    light.setIntensity(1);
+
+    // 环境光
+    light.useAmbient();
+    light.setAmbientColor(Color.WHITE.clone());
+    light.setAmbientIntensity(0.3);
+
+    // 镜面高光
+    light.setSpecularColor(Color.RED.clone());
+    light.setSpecularIntensity(0.5);
+}
+
 // 使用平行光
 const useDirectLight = () => {
     light = new DirectLight();
@@ -47,7 +65,7 @@ const useDirectLight = () => {
     // 环境光
     light.useAmbient();
     light.setAmbientColor(Color.WHITE.clone());
-    light.setAmbientIntensity(0.1);
+    light.setAmbientIntensity(0.3);
 
     // 镜面高光
     light.setSpecularColor(Color.WHITE.clone());
@@ -105,8 +123,8 @@ const dealAutoRotation = () => {
             // 更新model矩阵
             shader.modelMatrix = CalcUtil.mat4MulArr([
                 child.positionMat4,
-                Mat4.getRotationMat4X(angle),
-                // Mat4.getRotationMat4Y(angle),
+                // Mat4.getRotationMat4X(angle),
+                Mat4.getRotationMat4Y(angle),
                 // Mat4.getRotationMat4Z(angle),
             ])
         }
@@ -131,7 +149,7 @@ const loadResource = async () => {
 
     model.addObject(object);
 
-    await texture.setImageDataWithSrc(Tex1);
+    await texture.setImageDataWithSrc(Tex2);
     material.setShader(shader);
     material.setTexture(texture);
 
@@ -167,7 +185,8 @@ const update = () => {
 
 loadResource().then(() => loaded = true)
 
-useDirectLight();
+useBaseLight();
+// useDirectLight();
 // usePointLight();
 // useSpotLight();
 

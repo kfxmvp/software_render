@@ -18,7 +18,7 @@ export class PointLight extends Light {
         this._quadratic = 0.032;
     }
 
-    /**计算光照信息 用phong模型 */
+    /**计算光照信息 用Phong模型 */
     public calc(viewDir: Vec4, worldPosition: Vec4, normal: Vec4): Color {
         const { _constant, _linear, _quadratic } = this;
         // 片元到光源的距离

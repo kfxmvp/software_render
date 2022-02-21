@@ -2,6 +2,7 @@ import { CalcUtil } from "../base/util/calc";
 import { CommonUtil } from "../base/util/common";
 import { Vec4 } from "../base/vec4";
 import { FrameBuffer } from "./buffer";
+import { Camera } from "./camera";
 import { Mesh } from "./mesh";
 import { Scene } from "./scene";
 import { Shader } from "./shader/shader";
@@ -50,7 +51,7 @@ export class Raster {
             node.model.object.forEach(object => {
                 const mesh = object?.getMesh();
                 const shader = object?.getMaterial()?.getShader();
-                this._renderMesh(mesh, shader);
+                this._renderMesh(mesh, shader, scene.camera);
             })
         })
         _ctx.putImageData(_imageData, 0, 0);
@@ -127,12 +128,12 @@ export class Raster {
      * 
      * @memberOf Raster
      */
-    private _faceCulling(v1: Vec4, v2: Vec4, v3: Vec4) {
+    private _faceCulling(v1: Vec4, v2: Vec4, v3: Vec4, camera: Camera) {
         const line1 = v2.sub(v1);
         const line2 = v3.sub(v1);
 
         const normal = line1.cross(line2).normalize();
-        const view = new Vec4(0, 0, 1);
+        const view = camera.z.clone().mul3(-1);
         const dot = normal.dot(view);
         return dot < 0;
     }
@@ -145,7 +146,7 @@ export class Raster {
      * 
      * @memberOf Raster
      */
-    private _renderMesh(mesh: Mesh, shader: Shader) {
+    private _renderMesh(mesh: Mesh, shader: Shader, camera: Camera) {
         const { EBO, VBO } = mesh;
         const { _width, _height } = this;
 
@@ -164,7 +165,7 @@ export class Raster {
             this._NDC(vf2);
             this._NDC(vf3);
 
-            if (this._faceCulling(vf1.windowPosition, vf2.windowPosition, vf3.windowPosition)) continue;
+            if (this._faceCulling(vf1.windowPosition, vf2.windowPosition, vf3.windowPosition, camera)) continue;
 
             CalcUtil.vec4MulMat4(vf1.windowPosition, viewPortVertex, vf1.windowPosition);
             CalcUtil.vec4MulMat4(vf2.windowPosition, viewPortVertex, vf2.windowPosition);

@@ -85,4 +85,24 @@ export class CalcUtil {
 
         return new Vec4(alpha, beta, gamma, 0);
     }
+
+    public static reflect(lightDir: Vec4, normal: Vec4): Vec4 {
+        const reflect = lightDir
+            .sub(normal.clone().mul3(lightDir.dotVec3(normal) * 2))
+            .normalize();
+        return reflect;
+    }
+
+    public static clamp(number: number, lower: number, upper: number): number {
+        number = +number;
+        lower = +lower;
+        upper = +upper;
+        lower = lower === lower ? lower : 0;
+        upper = upper === upper ? upper : 0;
+        if (number === number) {
+            number = number <= upper ? number : upper;
+            number = number >= lower ? number : lower;
+        }
+        return number;
+    }
 }

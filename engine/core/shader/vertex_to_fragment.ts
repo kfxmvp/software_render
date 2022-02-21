@@ -2,7 +2,7 @@ import { Color } from "../../base/color";
 import { Vec4 } from "../../base/vec4";
 
 export class Vert2Frag {
-    wordPosition: Vec4;
+    worldPosition: Vec4;
     windowPosition: Vec4;
     color: Color;
     normal: Vec4;
@@ -12,7 +12,7 @@ export class Vert2Frag {
 
     constructor() {
         this.windowPosition = new Vec4();
-        this.wordPosition = new Vec4();
+        this.worldPosition = new Vec4();
         this.color = new Color();
         this.normal = new Vec4();
     }
@@ -23,18 +23,18 @@ export class Vert2Frag {
         v2f2: Vert2Frag,
         v2f3: Vert2Frag
     ): void {
-        this.wordPosition.x =
-            v2f1.wordPosition.x * barycentricCoord.x +
-            v2f2.wordPosition.x * barycentricCoord.y +
-            v2f3.wordPosition.x * barycentricCoord.z;
-        this.wordPosition.y =
-            v2f1.wordPosition.y * barycentricCoord.x +
-            v2f2.wordPosition.y * barycentricCoord.y +
-            v2f3.wordPosition.y * barycentricCoord.z;
-        this.wordPosition.z =
-            v2f1.wordPosition.z * barycentricCoord.x +
-            v2f2.wordPosition.z * barycentricCoord.y +
-            v2f3.wordPosition.z * barycentricCoord.z;
+        this.worldPosition.x =
+            v2f1.worldPosition.x * barycentricCoord.x +
+            v2f2.worldPosition.x * barycentricCoord.y +
+            v2f3.worldPosition.x * barycentricCoord.z;
+        this.worldPosition.y =
+            v2f1.worldPosition.y * barycentricCoord.x +
+            v2f2.worldPosition.y * barycentricCoord.y +
+            v2f3.worldPosition.y * barycentricCoord.z;
+        this.worldPosition.z =
+            v2f1.worldPosition.z * barycentricCoord.x +
+            v2f2.worldPosition.z * barycentricCoord.y +
+            v2f3.worldPosition.z * barycentricCoord.z;
 
         this.color.r =
             v2f1.color.r * barycentricCoord.x +
